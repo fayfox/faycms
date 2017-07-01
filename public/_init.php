@@ -5,15 +5,14 @@ use fay\core\ErrorHandler;
 use fay\helpers\DumperHelper;
 
 define('DS', DIRECTORY_SEPARATOR);
-define('APPLICATION_PATH', realpath(BASEPATH.'..'.DS.'application'.DS.APPLICATION).DS);
+define('APPLICATION_PATH', realpath(BASEPATH.'..'.DS.'apps'.DS.APPLICATION).DS);
 define('VENDOR_PATH', realpath(BASEPATH.'..'.DS.'vendor') . DS);
-define('SYSTEM_PATH', realpath(VENDOR_PATH.'faysoft') . DS);
-define('BACKEND_PATH', realpath(SYSTEM_PATH.'cms').DS);
-define('MODULE_PATH', realpath(APPLICATION_PATH . 'modules') . DS);
+define('FAYSOFT_PATH', realpath(VENDOR_PATH.'faysoft') . DS);
+define('CMS_PATH', realpath(FAYSOFT_PATH.'cms').DS);
 
 require VENDOR_PATH . 'autoload.php';
 //包含基础文件
-require SYSTEM_PATH.'fay/core/Loader.php';
+require FAYSOFT_PATH.'fay/core/Loader.php';
 
 //注册自动加载
 spl_autoload_register('fay\core\Loader::autoload');
@@ -30,7 +29,7 @@ $error_handler->register();
  * @return string
  */
 function pr($var, $encode = false, $return = false){
-	return DumperHelper::pr($var, $encode, $return);
+    return DumperHelper::pr($var, $encode, $return);
 }
 
 /**
@@ -38,15 +37,15 @@ function pr($var, $encode = false, $return = false){
  * @param int $depth
  */
 function dump($var, $depth = 10){
-	DumperHelper::dump($var, $depth);
+    DumperHelper::dump($var, $depth);
 }
 
 /**
  * 循环调用dump后die脚本
  */
 function dd(){
-	array_map(function($x){
-		dump($x);
-	}, func_get_args());
-	die;
+    array_map(function($x){
+        dump($x);
+    }, func_get_args());
+    die;
 }
