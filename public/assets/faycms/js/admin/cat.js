@@ -1,4 +1,5 @@
 var cat = {
+    'getCatUrl': system.url('cms/admin/category/get'),
     'editCat':function(){
         common.loadFancybox(function(){
             $('.edit-cat-link').fancybox({
@@ -10,7 +11,7 @@ var cat = {
                     });
                     $.ajax({
                         type: 'GET',
-                        url: system.url('cms/admin/category/get'),
+                        url: cat.getCatUrl,
                         data: {'id': slide.opts.$orig.attr('data-id')},
                         dataType: 'json',
                         cache: false,
@@ -21,7 +22,7 @@ var cat = {
                                 $editCatDialog.find("input[name='id']").val(resp.data.cat.id);
                                 $editCatDialog.find("input[name='title']").val(resp.data.cat.title);
                                 $editCatDialog.find("input[name='alias']").val(resp.data.cat.alias);
-                                $editCatDialog.find("input[name='alias']").attr('data-ajax', system.url('cms/admin/category/is-alias-not-exist', {id:resp.data.cat.id}));
+                                $editCatDialog.find("input[name='alias']").attr('data-ajax-params', '{id:'+resp.data.cat.id+'}');
                                 
                                 if(resp.data.cat.is_nav == 1){
                                     $editCatDialog.find("input[name='is_nav']").prop('checked', 'checked');
@@ -41,7 +42,7 @@ var cat = {
                                             }), '" />',
                                         '</a>',
                                         '<br>',
-                                        '<a href="javascript:;" class="remove-pic">移除插图</a>'
+                                        '<a href="javascript:;" class="remove-file_id-link">移除插图</a>'
                                     ].join(''));
                                 }else{
                                     $editCatDialog.find('.upload-preview-container').html('');
@@ -111,10 +112,6 @@ var cat = {
         });
     },
     'events':function(){
-        $(document).on('click', '.remove-pic', function(){
-            $(this).parent().html('');
-        });
-        
         $('.tree-container').on('click', '.leaf-title.parent', function(){
             $li = $(this).parent().parent();
             if($li.hasClass('close')){
@@ -132,10 +129,6 @@ var cat = {
             $(this).addClass('hover');
         }, function(){
             $(this).removeClass('hover');
-        });
-
-        $('.edit-sort').feditsort({
-            'url':system.url('cms/admin/category/sort')
         });
     },
     'init':function(){

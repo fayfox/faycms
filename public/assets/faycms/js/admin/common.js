@@ -593,7 +593,7 @@ var common = {
                 });
                 
                 var config = {
-                    'height':$visualEditor.height()
+                    'height': $visualEditor.height()
                 };
                 if(common.filebrowserImageUploadUrl){
                     config.filebrowserImageUploadUrl = common.filebrowserImageUploadUrl;
@@ -604,10 +604,10 @@ var common = {
                 if($visualEditor.hasClass('visual-simple') || parseInt($(window).width()) < 743){
                     //简化模式
                     config.toolbar = [
-                          ['Source'],
+                        ['Source'],
                         ['TextColor','BGColor'],
                         ['Bold','Italic','Underline','Strike','Subscript','Superscript','-','RemoveFormat'],
-                          ['Image','Table']
+                        ['Image','Table']
                       ];
                     //简化模式回车设为br而非p
                     config.enterMode = CKEDITOR.ENTER_BR;
@@ -689,7 +689,9 @@ var common = {
             if(!$(this).parent().hasClass('active')){
                 //如果被点击的tab不是当前tab，则先把当前tab对应div中的poshytip清掉
                 $($(this).parent().siblings('.active').find('a').attr('href')).find('input,select,textarea').each(function(){
-                    $(this).poshytip('hide');
+                    if($(this).data('poshytip')){
+                        $(this).poshytip('hide');
+                    }
                 });
             }
             $($(this).attr('href')).show().siblings().hide();
@@ -1020,6 +1022,52 @@ var common = {
             });
         }
     },
+    /**
+     * Ajax提交表单，提交前锁定整个窗口，提交后解锁
+     */
+    'ajaxForm': function(){
+        system.getCss(system.assets('css/tip-twitter/tip-twitter.css'));
+        system.getScript(system.assets('js/jquery.poshytip.min.js'));
+
+        system.getScript(system.assets('faycms/js/fayfox.validform.min.js'), function(){
+            $('.ajax-form').validform({
+                'ajaxSubmit': true,
+                'onAjaxEnd': function(obj, resp){
+                    if(!resp.status){
+                        $('body').unblock();
+                    }
+                },
+                'beforeSubmit': function(){
+                    $('body').block({
+                        'zindex': 1300
+                    });
+                },
+                'onError': function(obj, msg){
+                    $('body').unblock();
+                    var last = $.validform.getElementsByName(obj).last();
+                    last.poshytip('destroy');
+                    //报错
+                    last.poshytip({
+                        'className': 'tip-twitter',
+                        'showOn': 'none',
+                        'alignTo': 'target',
+                        'alignX': 'inner-right',
+                        'offsetX': -60,
+                        'offsetY': 5,
+                        'content': msg
+                    }).poshytip('show');
+                },
+                'onSuccess': function(obj){
+                    var last = $.validform.getElementsByName(obj).last();
+                    last.poshytip('destroy');
+                },
+                'afterAjaxSubmit': function(){
+                    $('body').unblock();
+                    common.notify('保存成功', 'success');
+                }
+            });
+        });
+    },
     'init': function(){
         this.fancybox();
         this.menu();
@@ -1044,5 +1092,6 @@ var common = {
         this.toggle();
         this.postPreview();
         this.fixBox();
+        this.ajaxForm();
     }
 };
